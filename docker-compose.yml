@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: tripzy
+      POSTGRES_USER: tripzy
+      POSTGRES_PASSWORD: tripzy
+    ports:
+      - "5432:5432"
+    volumes:
+      - tripzy_pg_data:/var/lib/postgresql/data
+
+volumes:
+  tripzy_pg_data:
+

@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String               @id @default(cuid())
+  name              String
+  email             String               @unique
+  passwordHash      String
+  emailVerified     Boolean              @default(false)
+  emailVerifiedAt   DateTime?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  bookings          Booking[]
+  verificationToken VerificationToken[]
+  resetToken        PasswordResetToken[]
+}
+
+model Booking {
+  id                 String   @id @default(cuid())
+  bookingRef         String   @unique
+  userId             String
+  fromCity           String
+  toCity             String
+  travelDate         DateTime
+  travelType         String
+  platformName       String
+  finalPrice         Int
+  passengers         Int
+  travellerName      String
+  maskedTravellerId  String
+  paymentMethod      String
+  paymentProvider    String
+  paymentIntentId    String   @unique
+  maskedPaymentValue String
+  createdAt          DateTime @default(now())
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model VerificationToken {
+  id         String    @id @default(cuid())
+  userId     String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+model PasswordResetToken {
+  id         String    @id @default(cuid())
+  userId     String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+model RateLimitEvent {
+  id         String   @id @default(cuid())
+  action     String
+  identifier String
+  createdAt  DateTime @default(now())
+
+  @@index([action, identifier, createdAt])
+}

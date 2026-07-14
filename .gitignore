@@ -1,0 +1,32 @@
+# Node
+node_modules/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Next.js
+apps/web/.next/
+apps/web/out/
+apps/web/.tripzy-local-auth.json
+
+# Prisma
+apps/web/prisma/*.db
+apps/web/prisma/*.db-journal
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
