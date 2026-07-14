@@ -6,15 +6,6 @@
     "open:web": "powershell -NoProfile -Command Start-Process http://localhost:3001"
   },
   "devDependencies": {
-    "autoprefixer": "^10.5.2",
-    "concurrently": "^10.0.3",
-    "postcss": "^8.5.16",
-    "tailwindcss": "^4.3.1"
-  },
-  "dependencies": {
-    "@tailwindcss/postcss": "^4.3.1",
-    "next": "^16.2.9",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "concurrently": "^10.0.3"
   }
 }
