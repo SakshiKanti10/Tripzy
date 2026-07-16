@@ -3,7 +3,8 @@
     "dev:web": "npm --prefix apps/web run dev",
     "dev:api": "cd apps/api && uvicorn app.main:app --reload --port 8000",
     "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
-    "open:web": "powershell -NoProfile -Command Start-Process http://localhost:3001"
+    "open:web": "powershell -NoProfile -Command Start-Process http://localhost:3001",
+    "postinstall": "prisma generate"
   },
   "devDependencies": {
     "concurrently": "^10.0.3"
