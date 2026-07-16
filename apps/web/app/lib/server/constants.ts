@@ -1,1 +1,1 @@
-export const SESSION_COOKIE = "tripzy_session";
+export const SESSION_COOKIE = "session";
