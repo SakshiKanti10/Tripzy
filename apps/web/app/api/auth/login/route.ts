@@ -3,20 +3,32 @@ import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { SESSION_COOKIE } from "@/app/lib/server/constants";
 import crypto from "crypto";
+import { z } from "zod";
+
+const loginSchema = z.object({
+  email: z.string().email("Invalid email"),
+  password: z.string().min(1, "Password required"),
+});
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json();
+    const body = await req.json();
 
-    if (!email || !password) {
+    const parsed = loginSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: "Email and password required" },
+        { error: "Invalid email or password format" },
         { status: 400 }
       );
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const { email, password } = parsed.data;
 
+    const user = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+
+    // Same error for missing user OR wrong password — don't leak which one
     if (!user) {
       return NextResponse.json(
         { error: "Invalid credentials" },
@@ -24,7 +36,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // TODO: replace with proper password hash check (bcrypt/argon2)
+    // TODO: replace with bcrypt/argon2 before production
     const passwordHash = crypto
       .createHash("sha256")
       .update(password)
@@ -39,7 +51,10 @@ export async function POST(req: NextRequest) {
 
     const sessionToken = crypto.randomBytes(32).toString("hex");
 
-    cookies().set(SESSION_COOKIE, sessionToken, {
+    // For Next.js 15+, use: const cookieStore = await cookies();
+    const cookieStore = cookies();
+
+    cookieStore.set(SESSION_COOKIE, sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
