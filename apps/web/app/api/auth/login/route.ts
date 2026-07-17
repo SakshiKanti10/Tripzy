@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { SESSION_COOKIE } from "@/app/lib/server/constants";
+import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { z } from "zod";
 
@@ -28,7 +29,6 @@ export async function POST(req: NextRequest) {
       where: { email: email.toLowerCase() },
     });
 
-    // Same error for missing user OR wrong password — don't leak which one
     if (!user) {
       return NextResponse.json(
         { error: "Invalid credentials" },
@@ -36,13 +36,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // TODO: replace with bcrypt/argon2 before production
-    const passwordHash = crypto
-      .createHash("sha256")
-      .update(password)
-      .digest("hex");
+    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
 
-    if (passwordHash !== user.passwordHash) {
+    if (!isValidPassword) {
       return NextResponse.json(
         { error: "Invalid credentials" },
         { status: 401 }
@@ -51,7 +47,6 @@ export async function POST(req: NextRequest) {
 
     const sessionToken = crypto.randomBytes(32).toString("hex");
 
-    // For Next.js 15+, use: const cookieStore = await cookies();
     const cookieStore = cookies();
 
     cookieStore.set(SESSION_COOKIE, sessionToken, {
