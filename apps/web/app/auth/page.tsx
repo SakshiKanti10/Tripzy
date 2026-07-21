@@ -16,12 +16,13 @@ export default function AuthPage() {
     </Suspense>
   );
 }
-
 function AuthPageContent() {
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") || "/search";
+  const initialMode: AuthMode = searchParams.get("mode") === "signup" ? "signup" : "login";
 
-  const [mode, setMode] = useState<AuthMode>("login");
+  const [mode, setMode] = useState<AuthMode>(initialMode);
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
